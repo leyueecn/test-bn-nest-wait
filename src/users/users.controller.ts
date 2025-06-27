@@ -19,7 +19,7 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
