@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -12,12 +16,27 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const newUser = new this.userModel({
-      createUserDto,
-      password: hashedPassword,
-    });
-    return newUser.save();
+    try {
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+      const newUser = new this.userModel({
+        createUserDto,
+        password: hashedPassword,
+      });
+      return newUser.save();
+    } catch (error) {
+      if (error.code === 11000) {
+        if (error.message.includes('username')) {
+          throw new ConflictException('Username already exists.');
+        }
+        if (error.message.includes('email')) {
+          throw new ConflictException('Email already exists.');
+        }
+        throw new ConflictException(
+          'User with provided unique fields already exists.',
+        );
+      }
+      throw error;
+    }
   }
 
   async findAll(): Promise<User[]> {
