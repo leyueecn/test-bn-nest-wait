@@ -16,13 +16,7 @@ import { AppService } from './app.service';
         PORT: Joi.number().default(3000),
       }),
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
-      }),
-      inject: [ConfigService],
-    }),
+    MongooseModule.forRoot(process.env.MONGODB_URI!), // เพิ่ม ! ตรงนี้
   ],
   controllers: [AppController],
   providers: [AppService],
