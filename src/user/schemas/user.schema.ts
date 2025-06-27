@@ -5,20 +5,20 @@ export type UserDocument = User & Document;
 
 @Schema({ timestamps: true })
 export class User {
-    toObject(): { [x: string]: any; password: any; } {
-      throw new Error('Method not implemented.');
-    }
-    @Prop({ required: true, unique: true })
-    username: string;
+  toObject(): { [x: string]: any; password: any; } {
+    throw new Error('Method not implemented.');
+  }
+  @Prop({ required: true, unique: true })
+  username: string;
 
-    @Prop({ required: true, unique: true })
-    email: string;
+  @Prop({ required: true, unique: true })
+  email: string;
 
-    @Prop({ required: true })
-    password: string; // ใน production ควร hash password ด้วย bcrypt ก่อนบันทึกลง database
+  @Prop({ required: true })
+  password: string;
 
-    @Prop()
-    description?: string;
+  @Prop()
+  description?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
