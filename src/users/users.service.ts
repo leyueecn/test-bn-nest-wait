@@ -2,16 +2,21 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-import { User, UserDocument } from './schemas/user.schema'
-import { InjectModel } from '@nestjs/mongoose'
+import { User, UserDocument } from './schemas/user.schema';
+import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = new this.userModel(createUserDto)
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const newUser = new this.userModel({
+      createUserDto,
+      password: hashedPassword,
+    });
     return newUser.save();
   }
 
@@ -28,9 +33,9 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const existingUser = await this.userModel.findByIdAndUpdate(
-      id, updateUserDto, { new: true }
-    ).exec();
+    const existingUser = await this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
     if (!existingUser) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
