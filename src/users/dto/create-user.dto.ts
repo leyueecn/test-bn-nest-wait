@@ -8,19 +8,19 @@ export enum UserRole {
 export class CreateUserDto {
     @IsString()
     @IsNotEmpty()
-    readonly username: string;
+    username: string;
 
     @IsEmail()
-    readonly email: string;
+    email: string;
 
     @IsString()
     @IsNotEmpty()
-    readonly password: string;
+    password: string;
 
     @IsEnum(UserRole)
-    readonly role: UserRole;
+    role: UserRole;
 
     @IsOptional()
     @IsString()
-    readonly description?: string;
+    description?: string;
 }
