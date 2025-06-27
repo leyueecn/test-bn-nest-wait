@@ -27,26 +27,20 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const result = await this.userModel.findByIdAndUpdate(
+    const existingUser = await this.userModel.findByIdAndUpdate(
       id, updateUserDto, { new: true }
     ).exec();
-
-    if (!result) {
+    if (!existingUser) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-
-    return result;
+    return existingUser;
   }
 
-  async remove(id: string): Promise<{ message: string }> {
-
-    const result = await this.userModel.findOneAndDelete({ _id: id }).exec();
-
-    if (!result) {
+  async remove(id: string): Promise<any> {
+    const result = await this.userModel.deleteOne({ _id: id }).exec();
+    if (result.deletedCount === 0) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-
-    return { message: 'Delete successful' }
-
+    return { message: 'User deleted successfully' };
   }
 }
